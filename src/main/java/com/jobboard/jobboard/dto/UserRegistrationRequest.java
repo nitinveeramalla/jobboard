@@ -20,5 +20,5 @@ public class UserRegistrationRequest {
     @NotBlank(message = "password should not be blank")
     private String password;
 
-    private Role role = Role.USER;
+    private Role role = Role.ADMIN;
 }
