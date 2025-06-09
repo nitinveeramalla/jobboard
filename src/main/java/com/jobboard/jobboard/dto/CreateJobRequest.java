@@ -10,13 +10,13 @@ import lombok.Setter;
 @Setter
 public class CreateJobRequest {
 
-    @NotBlank(message = "title can't be emty")
+    @NotBlank(message = "title can't be empty")
     private String title;
 
-    @NotBlank(message = "description can't be emty")
+    @NotBlank(message = "description can't be empty")
     private String description;
 
-    @NotBlank(message = "company can't be emty")
+    @NotBlank(message = "company can't be empty")
     private String company;
 
     @Min(value = 0, message = "salary must be non-negative")
