@@ -4,6 +4,10 @@ import com.jobboard.jobboard.dto.CreateJobRequest;
 import com.jobboard.jobboard.entity.Job;
 import com.jobboard.jobboard.service.JobService;
 import jakarta.validation.Valid;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
+import org.springframework.data.web.PageableDefault;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -30,8 +34,11 @@ public class JobController {
     }
 
     @GetMapping
-    public List<Job> getAllJobs() {
-        return jobService.listAllJobs();
+    public Page<Job> getAllJobs(
+            @PageableDefault(page = 0, size = 20, sort = "postedDate", direction = Sort.Direction.DESC)
+            Pageable pageable
+    ) {
+        return jobService.listAllJobs(pageable);
     }
 
     @GetMapping("{id}")
@@ -51,5 +58,9 @@ public class JobController {
         jobService.deleteJobById(id);
     }
 
+    @GetMapping("/search")
+    public List<Job> searchJobs(@RequestParam String title) {
+        return jobService.searchByTitle(title);
+    }
 
 }

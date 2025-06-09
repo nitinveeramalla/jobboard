@@ -3,6 +3,8 @@ package com.jobboard.jobboard.service;
 import com.jobboard.jobboard.dto.CreateJobRequest;
 import com.jobboard.jobboard.entity.Job;
 import com.jobboard.jobboard.repository.JobRepository;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
@@ -26,8 +28,8 @@ public class JobService {
         return jobRepository.save(mapToEntity(request));
     }
 
-    public List<Job> listAllJobs(){
-        return jobRepository.findAll();
+    public Page<Job> listAllJobs(Pageable pageable){
+        return jobRepository.findAll(pageable);
     }
 
     public Job getJobById(Long id) {
@@ -51,6 +53,10 @@ public class JobService {
                     "Job not found: " + id);
         }
         jobRepository.deleteById(id);
+    }
+
+    public List<Job> searchByTitle(String keyword) {
+        return jobRepository.findByTitleContainingIgnoreCase(keyword);
     }
 
     public Job mapToEntity(CreateJobRequest request){
