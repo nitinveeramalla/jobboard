@@ -3,6 +3,8 @@ package com.jobboard.jobboard.service;
 import com.jobboard.jobboard.dto.CreateJobRequest;
 import com.jobboard.jobboard.entity.Job;
 import com.jobboard.jobboard.repository.JobRepository;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
@@ -19,12 +21,14 @@ public class JobService {
 
     private final JobRepository jobRepository;
 
+    private static final Logger log = LoggerFactory.getLogger(JobService.class);
+
     public JobService(JobRepository jobRepository){
         this.jobRepository = jobRepository;
     }
 
     public Job createJob(CreateJobRequest request){
-
+        log.info("Attempting to create job");
         return jobRepository.save(mapToEntity(request));
     }
 
@@ -39,6 +43,7 @@ public class JobService {
     }
 
     public Job updateJob(Long id, CreateJobRequest request){
+        log.info("updating Job");
         Job existingJob = getJobById(id);
         existingJob.setTitle(request.getTitle());
         existingJob.setDescription(request.getDescription());
@@ -52,6 +57,7 @@ public class JobService {
             throw new ResponseStatusException(HttpStatus.NOT_FOUND,
                     "Job not found: " + id);
         }
+        log.info("Attempting to delete Job");
         jobRepository.deleteById(id);
     }
 
@@ -67,6 +73,7 @@ public class JobService {
         job.setCompany(request.getCompany());
         job.setSalary(request.getSalary());
         job.setPostedDate(postedDate);
+        log.info("Job created"+ job);
         return job;
     }
 }

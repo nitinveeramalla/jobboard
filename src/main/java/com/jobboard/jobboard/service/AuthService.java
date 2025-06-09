@@ -5,6 +5,8 @@ import com.jobboard.jobboard.dto.UserRegistrationRequest;
 import com.jobboard.jobboard.entity.User;
 import com.jobboard.jobboard.repository.UserRepository;
 import com.jobboard.jobboard.security.JwtService;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 
@@ -19,7 +21,11 @@ public class AuthService {
 
     private final JwtService jwtService;
 
-    public AuthService(UserRepository userRepository, BCryptPasswordEncoder passwordEncoder, JwtService jwtService) {
+    private static final Logger log = LoggerFactory.getLogger(AuthService.class);
+
+    public AuthService(UserRepository userRepository,
+                       BCryptPasswordEncoder passwordEncoder,
+                       JwtService jwtService) {
         this.userRepository = userRepository;
         this.passwordEncoder = passwordEncoder;
         this.jwtService = jwtService;
@@ -27,14 +33,17 @@ public class AuthService {
 
     public String register(UserRegistrationRequest request) {
         if (userRepository.findByEmail(request.getEmail()).isPresent()) {
+            log.info("Email already exists");
             return "Email already Exists";
         }
         String hashedPassword = passwordEncoder.encode(request.getPassword());
         User newUser = new User(request.getName(), request.getEmail(), hashedPassword, request.getRole());
         try {
             userRepository.save(newUser);
+            log.info("new User registered");
             return "new User registered";
         } catch (Exception e) {
+            log.error("registration unsuccessful with exception" + e);
             return "registration unsuccessful";
         }
     }
@@ -45,6 +54,7 @@ public class AuthService {
                 user.get().getPassword())) {
             return jwtService.generateToken(user.get());
         }
+        log.error("Login Failed");
         return "Login Failed";
     }
 }
