@@ -25,6 +25,7 @@ public class SecurityConfig {
                 .sessionManagement(sm -> sm.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers("/api/auth/**").permitAll()
+                        .requestMatchers("/swagger-ui.html", "/swagger-ui/**", "/v3/api-docs/**").permitAll()
                         .requestMatchers("/actuator/health", "/actuator/info").permitAll()        // public health/info
                         .requestMatchers("/actuator/metrics/**", "/actuator/loggers/**").hasRole("ADMIN") // lock down metrics & loggers
                         .anyRequest().authenticated()

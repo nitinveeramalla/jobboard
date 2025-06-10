@@ -1,8 +1,13 @@
 package com.jobboard.jobboard.controller;
 
 import com.jobboard.jobboard.dto.CreateJobRequest;
+import com.jobboard.jobboard.dto.JobDto;
+import com.jobboard.jobboard.dto.JobFilterRequest;
 import com.jobboard.jobboard.entity.Job;
 import com.jobboard.jobboard.service.JobService;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -16,6 +21,7 @@ import org.springframework.web.bind.annotation.*;
 import java.net.URI;
 import java.util.List;
 
+@Tag(name = "Jobs", description = "Create, read, update, delete job postings")
 @RestController
 @RequestMapping("/api/jobs")
 public class JobController {
@@ -26,14 +32,20 @@ public class JobController {
         this.jobService = jobService;
     }
 
+    @Operation(summary = "Create a new job posting")
     @PostMapping
-    public ResponseEntity<Job> createJob(@Valid @RequestBody CreateJobRequest request) {
+    public ResponseEntity<JobDto> createJob(@Valid @RequestBody CreateJobRequest request) {
 
-        Job saved =  jobService.createJob(request);
+        JobDto saved =  jobService.createJob(request);
         URI location = URI.create("/api/jobs/" + saved.getId());
         return ResponseEntity.created(location).body(saved);
     }
 
+    @Operation(summary = "List all jobs",
+            parameters = {
+                    @Parameter(name="page", description="zero-based page index"),
+                    @Parameter(name="size", description="items per page")
+            })
     @GetMapping
     public Page<Job> getAllJobs(
             @PageableDefault(page = 0, size = 20, sort = "postedDate", direction = Sort.Direction.DESC)
@@ -66,4 +78,12 @@ public class JobController {
         return jobService.searchByTitle(title);
     }
 
+    @GetMapping("/filter")
+    public ResponseEntity<Page<JobDto>> filterJobs(
+            JobFilterRequest filter,
+            @PageableDefault(size = 20) Pageable pageable
+    ) {
+        Page<JobDto> page = jobService.filterJobs(filter, pageable);
+        return ResponseEntity.ok(page);
+    }
 }
